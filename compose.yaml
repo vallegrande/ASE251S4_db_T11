@@ -1,0 +1,80 @@
+services:
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${SQL_ADMIN_PASSWORD}
+      MSSQL_PID: Developer
+      MSSQL_MEMORY_LIMIT_MB: 2048
+    ports:
+      - "${SQL_HOST_PORT:-1433}:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$${MSSQL_SA_PASSWORD}\" -C -Q \"SELECT 1\""
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  sqlserver-init:
+    build:
+      context: ./db/sqlserver
+    environment:
+      SQL_HOST: sqlserver
+      SQL_ADMIN_USER: sa
+      SQL_ADMIN_PASSWORD: ${SQL_ADMIN_PASSWORD}
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    command: ["init"]
+    restart: "no"
+
+  mongodb:
+    image: mongo:8.0
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ADMIN_USER:-root}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ADMIN_PASSWORD}
+    ports:
+      - "${MONGO_HOST_PORT:-27017}:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mongosh",
+          "--host",
+          "localhost",
+          "--quiet",
+          "--eval",
+          "db.adminCommand('ping').ok"
+        ]
+      interval: 10s
+      timeout: 8s
+      retries: 30
+      start_period: 20s
+
+  mongodb-init:
+    build:
+      context: ./db/mongodb
+    environment:
+      MONGO_HOST: mongodb
+      MONGO_PORT: 27017
+      MONGO_ADMIN_USER: ${MONGO_ADMIN_USER:-root}
+      MONGO_ADMIN_PASSWORD: ${MONGO_ADMIN_PASSWORD}
+      MONGO_DB: agrimarket
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    command: ["init"]
+    restart: "no"
+
+volumes:
+  sqlserver-data:
+  mongo-data:
