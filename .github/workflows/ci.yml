@@ -1,0 +1,51 @@
+name: Database CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-databases:
+    name: Aplicar y verificar versiones de BD
+    runs-on: ubuntu-latest
+    env:
+      # Credenciales descartables solo para CI (no son las reales).
+      SQL_ADMIN_PASSWORD: AgriMarketCi2026!Sql
+      MONGO_ADMIN_USER: root
+      MONGO_ADMIN_PASSWORD: AgriMarketCi2026!Mongo
+      GIT_SHA: ${{ github.sha }}
+      RELEASE_VERSION: ci
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Levantar motores
+        run: docker compose up -d --build mongodb sqlserver
+
+      - name: Aplicar todas las versiones (MongoDB y SQL Server)
+        run: |
+          docker compose run --rm --build mongodb-init init
+          docker compose run --rm --build sqlserver-init init
+
+      - name: Probar rollback a V003 y volver a la última versión
+        run: |
+          docker compose run --rm mongodb-init rollback 3
+          docker compose run --rm mongodb-init init
+          docker compose run --rm mongodb-init verify
+
+      - name: Mostrar historial
+        if: always()
+        run: |
+          docker compose run --rm mongodb-init status
+          docker compose run --rm sqlserver-init status
+
+      - name: Apagar
+        if: always()
+        run: docker compose down --volumes

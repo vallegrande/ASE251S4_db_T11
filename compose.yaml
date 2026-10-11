@@ -1,5 +1,6 @@
 services:
 
+  # ---------------- SQL Server ----------------
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
@@ -29,12 +30,17 @@ services:
       SQL_HOST: sqlserver
       SQL_ADMIN_USER: sa
       SQL_ADMIN_PASSWORD: ${SQL_ADMIN_PASSWORD}
+      SQL_DATABASE: Agrimarket
+      TARGET_SCHEMA_VERSION: ${TARGET_SCHEMA_VERSION:-latest}
+      GIT_SHA: ${GIT_SHA:-local}
+      RELEASE_VERSION: ${RELEASE_VERSION:-local}
     depends_on:
       sqlserver:
         condition: service_healthy
     command: ["init"]
     restart: "no"
 
+  # ---------------- MongoDB ----------------
   mongodb:
     image: mongo:8.0
     environment:
@@ -68,7 +74,10 @@ services:
       MONGO_PORT: 27017
       MONGO_ADMIN_USER: ${MONGO_ADMIN_USER:-root}
       MONGO_ADMIN_PASSWORD: ${MONGO_ADMIN_PASSWORD}
-      MONGO_DB: agrimarket
+      MONGO_DATABASE: Agrimarket
+      TARGET_SCHEMA_VERSION: ${TARGET_SCHEMA_VERSION:-latest}
+      GIT_SHA: ${GIT_SHA:-local}
+      RELEASE_VERSION: ${RELEASE_VERSION:-local}
     depends_on:
       mongodb:
         condition: service_healthy

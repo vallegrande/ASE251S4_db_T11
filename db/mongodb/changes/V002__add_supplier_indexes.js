@@ -1,4 +1,5 @@
-const dbAgriMarket = db.getSiblingDB("agrimarket");
+// V002 - Índice por razón social en proveedores
+const dbAgriMarket = db.getSiblingDB("Agrimarket");
 
 dbAgriMarket.suppliers.createIndex(
     { businessName: 1 },

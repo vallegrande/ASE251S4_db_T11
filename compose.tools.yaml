@@ -1,0 +1,14 @@
+# Herramientas opcionales para la demostración (se usan junto a compose.yaml):
+#   docker compose -f compose.yaml -f compose.tools.yaml up -d mongo-express
+# Mongo Express queda en http://localhost:8081 para ver las colecciones y sus referencias.
+services:
+  mongo-express:
+    image: mongo-express:1.0.2
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_ADMIN_USER:-root}:${MONGO_ADMIN_PASSWORD}@mongodb:27017/?authSource=admin
+      ME_CONFIG_BASICAUTH: "false"
+    ports:
+      - "8081:8081"
+    depends_on:
+      mongodb:
+        condition: service_healthy

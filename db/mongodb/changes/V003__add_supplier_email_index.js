@@ -1,4 +1,5 @@
-const dbAgriMarket = db.getSiblingDB("agrimarket");
+// V003 - Índice por email en proveedores
+const dbAgriMarket = db.getSiblingDB("Agrimarket");
 
 dbAgriMarket.suppliers.createIndex(
     { email: 1 },

@@ -1,10 +1,26 @@
 FROM mcr.microsoft.com/mssql-tools:latest
 
+ARG RELEASE_VERSION=development
+ARG GIT_SHA=unknown
+
+ENV RELEASE_VERSION=$RELEASE_VERSION
+ENV GIT_SHA=$GIT_SHA
+
+LABEL org.opencontainers.image.title="AgriMarket SQL Server Runner" \
+      org.opencontainers.image.version="$RELEASE_VERSION" \
+      org.opencontainers.image.revision="$GIT_SHA"
+
 WORKDIR /lab
 
-COPY . /lab/
+COPY bootstrap/ ./bootstrap/
+COPY changes/ ./changes/
+COPY metadata/ ./metadata/
+COPY checks/ ./checks/
+COPY run.sh ./run.sh
 
-RUN chmod +x /lab/run.sh
+# Normaliza saltos de línea (Windows -> Linux) para que el checksum sea el mismo en cualquier máquina.
+RUN find /lab -type f \( -name '*.sql' -o -name '*.sh' \) -exec sed -i 's/\r$//' {} + \
+    && chmod +x /lab/run.sh
 
 ENTRYPOINT ["/bin/bash", "/lab/run.sh"]
 

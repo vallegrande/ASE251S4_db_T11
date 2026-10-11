@@ -12,9 +12,15 @@ LABEL org.opencontainers.image.title="AgriMarket MongoDB Runner" \
 
 WORKDIR /lab
 
-COPY . /lab/
+COPY bootstrap/ ./bootstrap/
+COPY changes/ ./changes/
+COPY metadata/ ./metadata/
+COPY checks/ ./checks/
+COPY run.sh ./run.sh
 
-RUN chmod +x /lab/run.sh
+# Normaliza saltos de línea (Windows -> Linux) para que el checksum sea el mismo en cualquier máquina.
+RUN find /lab -type f \( -name '*.js' -o -name '*.sh' \) -exec sed -i 's/\r$//' {} + \
+    && chmod +x /lab/run.sh
 
 ENTRYPOINT ["/bin/bash", "/lab/run.sh"]
 
