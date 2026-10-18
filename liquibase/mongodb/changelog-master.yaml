@@ -1,0 +1,24 @@
+# Changelog maestro de MongoDB: lista, EN ORDEN, los archivos de cambios.
+# Cada archivo = una versión (V001..V007) = un changeset.
+databaseChangeLog:
+  - include:
+      file: changelogs/001-baseline.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changelogs/002-seed-masters.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changelogs/003-supplier-indexes.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changelogs/004-referencing-customer-wishlists.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changelogs/005-referencing-order-events.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changelogs/006-referencing-supplier-products.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changelogs/007-referencing-product-price-history.yaml
+      relativeToChangelogFile: true

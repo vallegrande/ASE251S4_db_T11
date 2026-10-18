@@ -1,0 +1,36 @@
+# VERSION 3 - Índices de proveedores (razón social y email)
+databaseChangeLog:
+  - changeSet:
+      id: 003-supplier-indexes
+      author: equipo11
+      # Mejora las búsquedas de proveedores.
+      changes:
+        - runCommand:
+            command: |
+                {
+                  "createIndexes": "suppliers",
+                  "indexes": [
+                    {
+                      "key": {
+                        "businessName": 1
+                      },
+                      "name": "ix_suppliers_businessName"
+                    },
+                    {
+                      "key": {
+                        "email": 1
+                      },
+                      "name": "ix_suppliers_email"
+                    }
+                  ]
+                }
+      rollback:
+        - runCommand:
+            command: |
+                {
+                  "dropIndexes": "suppliers",
+                  "index": [
+                    "ix_suppliers_businessName",
+                    "ix_suppliers_email"
+                  ]
+                }

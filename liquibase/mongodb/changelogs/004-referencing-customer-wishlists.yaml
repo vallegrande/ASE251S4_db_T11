@@ -1,0 +1,116 @@
+# VERSION 4 - REFERENCING (Brando): customer_wishlists
+# customerId -> customers._id ; productId -> products._id
+# Relación muchos a muchos: se guardan solo los ids, no se copia el producto.
+databaseChangeLog:
+  - changeSet:
+      id: 004-customer-wishlists
+      author: brando
+      # Colección de favoritos con índice único (cliente, producto).
+      changes:
+        - runCommand:
+            command: |
+                {
+                  "create": "customer_wishlists",
+                  "validator": {
+                    "$jsonSchema": {
+                      "bsonType": "object",
+                      "required": [
+                        "customerId",
+                        "productId",
+                        "addedAt"
+                      ],
+                      "properties": {
+                        "customerId": {
+                          "bsonType": [
+                            "long",
+                            "int"
+                          ]
+                        },
+                        "productId": {
+                          "bsonType": [
+                            "long",
+                            "int"
+                          ]
+                        },
+                        "addedAt": {
+                          "bsonType": "date"
+                        },
+                        "note": {
+                          "bsonType": "string",
+                          "maxLength": 300
+                        }
+                      }
+                    }
+                  },
+                  "validationLevel": "strict",
+                  "validationAction": "error"
+                }
+        - runCommand:
+            command: |
+                {
+                  "createIndexes": "customer_wishlists",
+                  "indexes": [
+                    {
+                      "key": {
+                        "customerId": 1,
+                        "productId": 1
+                      },
+                      "name": "uq_wishlist_customer_product",
+                      "unique": true
+                    },
+                    {
+                      "key": {
+                        "productId": 1
+                      },
+                      "name": "ix_wishlist_productId"
+                    }
+                  ]
+                }
+        - runCommand:
+            command: |
+                {
+                  "insert": "customer_wishlists",
+                  "documents": [
+                    {
+                      "customerId": {
+                        "$numberLong": "1"
+                      },
+                      "productId": {
+                        "$numberLong": "1"
+                      },
+                      "addedAt": {
+                        "$date": "2026-01-01T00:00:00Z"
+                      },
+                      "note": "Para la próxima campaña"
+                    },
+                    {
+                      "customerId": {
+                        "$numberLong": "1"
+                      },
+                      "productId": {
+                        "$numberLong": "2"
+                      },
+                      "addedAt": {
+                        "$date": "2026-01-01T00:00:00Z"
+                      }
+                    },
+                    {
+                      "customerId": {
+                        "$numberLong": "2"
+                      },
+                      "productId": {
+                        "$numberLong": "2"
+                      },
+                      "addedAt": {
+                        "$date": "2026-01-01T00:00:00Z"
+                      },
+                      "note": "Cotizar por volumen"
+                    }
+                  ]
+                }
+      rollback:
+        - runCommand:
+            command: |
+                {
+                  "drop": "customer_wishlists"
+                }

@@ -1,0 +1,15 @@
+# Liquibase + extensión oficial para MongoDB.
+# La imagen base ya trae Liquibase y el driver de SQL Server, pero NO la extensión de MongoDB:
+# hay que agregar 5 .jar a /liquibase/lib (la extensión y los drivers de MongoDB).
+FROM liquibase/liquibase:4.33.0
+
+# Si alguna descarga falla, revisa que la versión exista en https://repo1.maven.org/maven2/
+# y cambia estos valores (la extensión debe coincidir con la versión de Liquibase).
+ARG LB_MONGO_EXT=4.33.0
+ARG MONGO_DRIVER=5.5.1
+
+ADD --chown=liquibase:liquibase https://repo1.maven.org/maven2/org/liquibase/ext/liquibase-mongodb/${LB_MONGO_EXT}/liquibase-mongodb-${LB_MONGO_EXT}.jar /liquibase/lib/
+ADD --chown=liquibase:liquibase https://repo1.maven.org/maven2/org/mongodb/mongodb-driver-sync/${MONGO_DRIVER}/mongodb-driver-sync-${MONGO_DRIVER}.jar /liquibase/lib/
+ADD --chown=liquibase:liquibase https://repo1.maven.org/maven2/org/mongodb/mongodb-driver-core/${MONGO_DRIVER}/mongodb-driver-core-${MONGO_DRIVER}.jar /liquibase/lib/
+ADD --chown=liquibase:liquibase https://repo1.maven.org/maven2/org/mongodb/bson/${MONGO_DRIVER}/bson-${MONGO_DRIVER}.jar /liquibase/lib/
+ADD --chown=liquibase:liquibase https://repo1.maven.org/maven2/org/mongodb/bson-record-codec/${MONGO_DRIVER}/bson-record-codec-${MONGO_DRIVER}.jar /liquibase/lib/

@@ -1,0 +1,127 @@
+# VERSION 7 - REFERENCING (Giancarlos): product_price_history
+# productId -> products._id
+# Historial de precios fuera del documento del producto.
+databaseChangeLog:
+  - changeSet:
+      id: 007-product-price-history
+      author: giancarlos
+      # Cada cambio de precio es un documento aparte.
+      changes:
+        - runCommand:
+            command: |
+                {
+                  "create": "product_price_history",
+                  "validator": {
+                    "$jsonSchema": {
+                      "bsonType": "object",
+                      "required": [
+                        "productId",
+                        "oldPrice",
+                        "newPrice",
+                        "changedAt"
+                      ],
+                      "properties": {
+                        "productId": {
+                          "bsonType": [
+                            "long",
+                            "int"
+                          ]
+                        },
+                        "oldPrice": {
+                          "bsonType": "decimal"
+                        },
+                        "newPrice": {
+                          "bsonType": "decimal"
+                        },
+                        "changedAt": {
+                          "bsonType": "date"
+                        },
+                        "changedBy": {
+                          "bsonType": "string",
+                          "maxLength": 100
+                        },
+                        "reason": {
+                          "bsonType": "string",
+                          "maxLength": 300
+                        }
+                      }
+                    }
+                  },
+                  "validationLevel": "strict",
+                  "validationAction": "error"
+                }
+        - runCommand:
+            command: |
+                {
+                  "createIndexes": "product_price_history",
+                  "indexes": [
+                    {
+                      "key": {
+                        "productId": 1,
+                        "changedAt": -1
+                      },
+                      "name": "ix_price_history_product_time"
+                    }
+                  ]
+                }
+        - runCommand:
+            command: |
+                {
+                  "insert": "product_price_history",
+                  "documents": [
+                    {
+                      "productId": {
+                        "$numberLong": "1"
+                      },
+                      "oldPrice": {
+                        "$numberDecimal": "17.00"
+                      },
+                      "newPrice": {
+                        "$numberDecimal": "18.50"
+                      },
+                      "changedAt": {
+                        "$date": "2026-03-01T00:00:00Z"
+                      },
+                      "changedBy": "admin",
+                      "reason": "Aumento del costo del proveedor"
+                    },
+                    {
+                      "productId": {
+                        "$numberLong": "2"
+                      },
+                      "oldPrice": {
+                        "$numberDecimal": "85.00"
+                      },
+                      "newPrice": {
+                        "$numberDecimal": "90.00"
+                      },
+                      "changedAt": {
+                        "$date": "2026-04-10T00:00:00Z"
+                      },
+                      "changedBy": "admin",
+                      "reason": "Ajuste de temporada"
+                    },
+                    {
+                      "productId": {
+                        "$numberLong": "2"
+                      },
+                      "oldPrice": {
+                        "$numberDecimal": "90.00"
+                      },
+                      "newPrice": {
+                        "$numberDecimal": "95.00"
+                      },
+                      "changedAt": {
+                        "$date": "2026-08-15T00:00:00Z"
+                      },
+                      "changedBy": "admin",
+                      "reason": "Aumento del costo del proveedor"
+                    }
+                  ]
+                }
+      rollback:
+        - runCommand:
+            command: |
+                {
+                  "drop": "product_price_history"
+                }

@@ -1,0 +1,156 @@
+# VERSION 6 - REFERENCING (Giancarlos): supplier_products
+# supplierId -> suppliers._id ; productId -> products._id
+# Catálogo de compra con costo y días de entrega.
+databaseChangeLog:
+  - changeSet:
+      id: 006-supplier-products
+      author: giancarlos
+      # Qué proveedor vende qué producto y a qué costo.
+      changes:
+        - runCommand:
+            command: |
+                {
+                  "create": "supplier_products",
+                  "validator": {
+                    "$jsonSchema": {
+                      "bsonType": "object",
+                      "required": [
+                        "supplierId",
+                        "productId",
+                        "unitCost",
+                        "isActive"
+                      ],
+                      "properties": {
+                        "supplierId": {
+                          "bsonType": [
+                            "long",
+                            "int"
+                          ]
+                        },
+                        "productId": {
+                          "bsonType": [
+                            "long",
+                            "int"
+                          ]
+                        },
+                        "supplierSku": {
+                          "bsonType": "string",
+                          "maxLength": 50
+                        },
+                        "unitCost": {
+                          "bsonType": "decimal"
+                        },
+                        "leadTimeDays": {
+                          "bsonType": [
+                            "long",
+                            "int"
+                          ],
+                          "minimum": 0
+                        },
+                        "isActive": {
+                          "bsonType": "bool"
+                        }
+                      }
+                    }
+                  },
+                  "validationLevel": "strict",
+                  "validationAction": "error"
+                }
+        - runCommand:
+            command: |
+                {
+                  "createIndexes": "supplier_products",
+                  "indexes": [
+                    {
+                      "key": {
+                        "supplierId": 1,
+                        "productId": 1
+                      },
+                      "name": "uq_supplier_products",
+                      "unique": true
+                    },
+                    {
+                      "key": {
+                        "productId": 1
+                      },
+                      "name": "ix_supplier_products_productId"
+                    }
+                  ]
+                }
+        - runCommand:
+            command: |
+                {
+                  "insert": "supplier_products",
+                  "documents": [
+                    {
+                      "supplierId": {
+                        "$numberLong": "1"
+                      },
+                      "productId": {
+                        "$numberLong": "1"
+                      },
+                      "supplierSku": "DAC-FUN-001",
+                      "unitCost": {
+                        "$numberDecimal": "15.20"
+                      },
+                      "leadTimeDays": {
+                        "$numberInt": "3"
+                      },
+                      "isActive": true
+                    },
+                    {
+                      "supplierId": {
+                        "$numberLong": "1"
+                      },
+                      "productId": {
+                        "$numberLong": "3"
+                      },
+                      "supplierSku": "DAC-FER-046",
+                      "unitCost": {
+                        "$numberDecimal": "98.00"
+                      },
+                      "leadTimeDays": {
+                        "$numberInt": "5"
+                      },
+                      "isActive": true
+                    },
+                    {
+                      "supplierId": {
+                        "$numberLong": "2"
+                      },
+                      "productId": {
+                        "$numberLong": "2"
+                      },
+                      "supplierSku": "IDV-NPK-202020",
+                      "unitCost": {
+                        "$numberDecimal": "78.50"
+                      },
+                      "leadTimeDays": {
+                        "$numberInt": "4"
+                      },
+                      "isActive": true
+                    },
+                    {
+                      "supplierId": {
+                        "$numberLong": "2"
+                      },
+                      "productId": {
+                        "$numberLong": "3"
+                      },
+                      "supplierSku": "IDV-UREA-50",
+                      "unitCost": {
+                        "$numberDecimal": "101.00"
+                      },
+                      "leadTimeDays": {
+                        "$numberInt": "4"
+                      },
+                      "isActive": true
+                    }
+                  ]
+                }
+      rollback:
+        - runCommand:
+            command: |
+                {
+                  "drop": "supplier_products"
+                }

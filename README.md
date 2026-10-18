@@ -6,6 +6,32 @@ Spring WebFlux `ASE251S4_T11-be`.
 
 Actividad **S09 · AP4 – Versionamiento y Modelado de Datos**. Estrategia de modelado asignada al equipo 11: **Referencing**.
 
+## Actividad GBD: Liquibase + transacciones en MongoDB
+
+Además de los scripts propios de la actividad anterior (`db/`), el repositorio incluye:
+
+| Carpeta / archivo | Para qué sirve |
+|---|---|
+| `compose.liquibase.yaml` | SQL Server + MongoDB (replica set) + contenedores de **Liquibase** |
+| `liquibase/sqlserver/` | Changelog de SQL Server (formatted SQL, 4 versiones) |
+| `liquibase/mongodb/` | Changelog de MongoDB (YAML, 7 versiones, incluye los 4 ejemplos de Referencing) |
+| `transactions/` | Scripts `mongosh` de **transacciones** (commit, abort y bloqueos) |
+| `informe/` | Informe con las respuestas teóricas y el paso a paso |
+| `demo/*.ps1` | Demostraciones guiadas para el video (PowerShell) |
+| `docs/GUION_VIDEO_LIQUIBASE.md` | Guion del video de máximo 20 minutos |
+
+```powershell
+$env:COMPOSE_FILE = "compose.liquibase.yaml"      # evita escribir -f cada vez
+docker compose up -d --build                      # levanta todo y aplica los changelogs
+docker compose run --rm liquibase-mongodb history
+docker compose run --rm liquibase-mongodb rollback-count --count=4     # retroceder 4 cambios
+docker compose exec -T mongodb mongosh --quiet /transactions/01-checkout-commit.js
+```
+
+Puertos de esta versión: SQL Server `1434`, MongoDB `27018` (no chocan con `compose.yaml`).
+
+---
+
 ## Qué contiene
 
 ```

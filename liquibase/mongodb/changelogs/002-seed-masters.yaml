@@ -1,0 +1,437 @@
+# VERSION 2 - Datos semilla de los maestros
+# Ids Long, como los genera el backend. Los contadores quedan en el último id sembrado.
+databaseChangeLog:
+  - changeSet:
+      id: 002-seed-masters
+      author: equipo11
+      # Productos 1-3, clientes 1-2, proveedores 1-2, marcas y categorías.
+      changes:
+        - runCommand:
+            command: |
+                {
+                  "insert": "brands",
+                  "documents": [
+                    {
+                      "_id": {
+                        "$numberLong": "1"
+                      },
+                      "brandName": "AgroNova",
+                      "isActive": true,
+                      "createdAt": {
+                        "$date": "2026-01-01T00:00:00Z"
+                      },
+                      "updatedAt": {
+                        "$date": "2026-01-01T00:00:00Z"
+                      }
+                    },
+                    {
+                      "_id": {
+                        "$numberLong": "2"
+                      },
+                      "brandName": "CampoVerde",
+                      "isActive": true,
+                      "createdAt": {
+                        "$date": "2026-01-01T00:00:00Z"
+                      },
+                      "updatedAt": {
+                        "$date": "2026-01-01T00:00:00Z"
+                      }
+                    }
+                  ]
+                }
+        - runCommand:
+            command: |
+                {
+                  "insert": "categories",
+                  "documents": [
+                    {
+                      "_id": {
+                        "$numberLong": "1"
+                      },
+                      "categoryName": "Fungicidas",
+                      "description": "Control de hongos en cultivos",
+                      "level": {
+                        "$numberInt": "1"
+                      },
+                      "code": "FUN",
+                      "orderDisplay": {
+                        "$numberInt": "1"
+                      },
+                      "isActive": true,
+                      "createdAt": {
+                        "$date": "2026-01-01T00:00:00Z"
+                      },
+                      "updatedAt": {
+                        "$date": "2026-01-01T00:00:00Z"
+                      }
+                    },
+                    {
+                      "_id": {
+                        "$numberLong": "2"
+                      },
+                      "categoryName": "Fertilizantes",
+                      "description": "Nutrición del suelo y del cultivo",
+                      "level": {
+                        "$numberInt": "1"
+                      },
+                      "code": "FER",
+                      "orderDisplay": {
+                        "$numberInt": "2"
+                      },
+                      "isActive": true,
+                      "createdAt": {
+                        "$date": "2026-01-01T00:00:00Z"
+                      },
+                      "updatedAt": {
+                        "$date": "2026-01-01T00:00:00Z"
+                      }
+                    }
+                  ]
+                }
+        - runCommand:
+            command: |
+                {
+                  "insert": "suppliers",
+                  "documents": [
+                    {
+                      "_id": {
+                        "$numberLong": "1"
+                      },
+                      "businessName": "Distribuidora Agro Cañete S.A.C.",
+                      "docType": "RUC",
+                      "docNumber": "20512345678",
+                      "phone": "014445566",
+                      "email": "ventas@agrocanete.example.com",
+                      "address": "Av. Mariscal Benavides 120, San Vicente de Cañete",
+                      "contactPerson": "Marco Salas",
+                      "isActive": true,
+                      "createdAt": {
+                        "$date": "2026-01-01T00:00:00Z"
+                      },
+                      "updatedAt": {
+                        "$date": "2026-01-01T00:00:00Z"
+                      }
+                    },
+                    {
+                      "_id": {
+                        "$numberLong": "2"
+                      },
+                      "businessName": "Insumos del Valle E.I.R.L.",
+                      "docType": "RUC",
+                      "docNumber": "20598765432",
+                      "phone": "014447788",
+                      "email": "contacto@insumosvalle.example.com",
+                      "address": "Jr. Bolognesi 455, Imperial",
+                      "contactPerson": "Rosa Paredes",
+                      "isActive": true,
+                      "createdAt": {
+                        "$date": "2026-01-01T00:00:00Z"
+                      },
+                      "updatedAt": {
+                        "$date": "2026-01-01T00:00:00Z"
+                      }
+                    }
+                  ]
+                }
+        - runCommand:
+            command: |
+                {
+                  "insert": "products",
+                  "documents": [
+                    {
+                      "_id": {
+                        "$numberLong": "1"
+                      },
+                      "name": "Fungicida Cobre 50 WP",
+                      "activeIngredient": "Oxicloruro de cobre",
+                      "presentation": "Bolsa 1 kg",
+                      "basePrice": {
+                        "$numberDecimal": "18.50"
+                      },
+                      "sku": "FUN-001",
+                      "categoryId": "1",
+                      "brandId": "1",
+                      "description": "Fungicida preventivo y curativo",
+                      "isActive": true,
+                      "createdAt": {
+                        "$date": "2026-01-01T00:00:00Z"
+                      },
+                      "updatedAt": {
+                        "$date": "2026-01-01T00:00:00Z"
+                      }
+                    },
+                    {
+                      "_id": {
+                        "$numberLong": "2"
+                      },
+                      "name": "Fertilizante NPK 20-20-20",
+                      "activeIngredient": "Nitrógeno, fósforo y potasio",
+                      "presentation": "Saco 25 kg",
+                      "basePrice": {
+                        "$numberDecimal": "95.00"
+                      },
+                      "sku": "FER-001",
+                      "categoryId": "2",
+                      "brandId": "2",
+                      "description": "Fertilizante balanceado",
+                      "isActive": true,
+                      "createdAt": {
+                        "$date": "2026-01-01T00:00:00Z"
+                      },
+                      "updatedAt": {
+                        "$date": "2026-01-01T00:00:00Z"
+                      }
+                    },
+                    {
+                      "_id": {
+                        "$numberLong": "3"
+                      },
+                      "name": "Fertilizante Urea 46%",
+                      "activeIngredient": "Urea",
+                      "presentation": "Saco 50 kg",
+                      "basePrice": {
+                        "$numberDecimal": "120.00"
+                      },
+                      "sku": "FER-002",
+                      "categoryId": "2",
+                      "brandId": "1",
+                      "description": "Fuente de nitrógeno",
+                      "isActive": true,
+                      "createdAt": {
+                        "$date": "2026-01-01T00:00:00Z"
+                      },
+                      "updatedAt": {
+                        "$date": "2026-01-01T00:00:00Z"
+                      }
+                    }
+                  ]
+                }
+        - runCommand:
+            command: |
+                {
+                  "insert": "customers",
+                  "documents": [
+                    {
+                      "_id": {
+                        "$numberLong": "1"
+                      },
+                      "docType": "DNI",
+                      "docNumber": "70000001",
+                      "firstName": "Ana",
+                      "lastName": "Quispe",
+                      "email": "ana.quispe@example.com",
+                      "phone": "999000001",
+                      "address": "Imperial, Cañete",
+                      "totalVisits": {
+                        "$numberInt": "0"
+                      },
+                      "customerSince": {
+                        "$date": "2026-01-15T00:00:00Z"
+                      },
+                      "isActive": true,
+                      "createdAt": {
+                        "$date": "2026-01-01T00:00:00Z"
+                      },
+                      "updatedAt": {
+                        "$date": "2026-01-01T00:00:00Z"
+                      }
+                    },
+                    {
+                      "_id": {
+                        "$numberLong": "2"
+                      },
+                      "docType": "DNI",
+                      "docNumber": "70000002",
+                      "firstName": "Luis",
+                      "lastName": "Huamán",
+                      "email": "luis.huaman@example.com",
+                      "phone": "999000002",
+                      "address": "Nuevo Imperial, Cañete",
+                      "totalVisits": {
+                        "$numberInt": "0"
+                      },
+                      "customerSince": {
+                        "$date": "2026-02-20T00:00:00Z"
+                      },
+                      "isActive": true,
+                      "createdAt": {
+                        "$date": "2026-01-01T00:00:00Z"
+                      },
+                      "updatedAt": {
+                        "$date": "2026-01-01T00:00:00Z"
+                      }
+                    }
+                  ]
+                }
+        - runCommand:
+            command: |
+                {
+                  "insert": "counters",
+                  "documents": [
+                    {
+                      "_id": "brands_sequence",
+                      "seq": {
+                        "$numberLong": "2"
+                      }
+                    },
+                    {
+                      "_id": "categories_sequence",
+                      "seq": {
+                        "$numberLong": "2"
+                      }
+                    },
+                    {
+                      "_id": "suppliers_sequence",
+                      "seq": {
+                        "$numberLong": "2"
+                      }
+                    },
+                    {
+                      "_id": "products_sequence",
+                      "seq": {
+                        "$numberLong": "3"
+                      }
+                    },
+                    {
+                      "_id": "customers_sequence",
+                      "seq": {
+                        "$numberLong": "2"
+                      }
+                    }
+                  ]
+                }
+      rollback:
+        - runCommand:
+            command: |
+                {
+                  "delete": "customers",
+                  "deletes": [
+                    {
+                      "q": {
+                        "_id": {
+                          "$in": [
+                            {
+                              "$numberLong": "1"
+                            },
+                            {
+                              "$numberLong": "2"
+                            }
+                          ]
+                        }
+                      },
+                      "limit": 0
+                    }
+                  ]
+                }
+        - runCommand:
+            command: |
+                {
+                  "delete": "products",
+                  "deletes": [
+                    {
+                      "q": {
+                        "_id": {
+                          "$in": [
+                            {
+                              "$numberLong": "1"
+                            },
+                            {
+                              "$numberLong": "2"
+                            },
+                            {
+                              "$numberLong": "3"
+                            }
+                          ]
+                        }
+                      },
+                      "limit": 0
+                    }
+                  ]
+                }
+        - runCommand:
+            command: |
+                {
+                  "delete": "suppliers",
+                  "deletes": [
+                    {
+                      "q": {
+                        "_id": {
+                          "$in": [
+                            {
+                              "$numberLong": "1"
+                            },
+                            {
+                              "$numberLong": "2"
+                            }
+                          ]
+                        }
+                      },
+                      "limit": 0
+                    }
+                  ]
+                }
+        - runCommand:
+            command: |
+                {
+                  "delete": "categories",
+                  "deletes": [
+                    {
+                      "q": {
+                        "_id": {
+                          "$in": [
+                            {
+                              "$numberLong": "1"
+                            },
+                            {
+                              "$numberLong": "2"
+                            }
+                          ]
+                        }
+                      },
+                      "limit": 0
+                    }
+                  ]
+                }
+        - runCommand:
+            command: |
+                {
+                  "delete": "brands",
+                  "deletes": [
+                    {
+                      "q": {
+                        "_id": {
+                          "$in": [
+                            {
+                              "$numberLong": "1"
+                            },
+                            {
+                              "$numberLong": "2"
+                            }
+                          ]
+                        }
+                      },
+                      "limit": 0
+                    }
+                  ]
+                }
+        - runCommand:
+            command: |
+                {
+                  "delete": "counters",
+                  "deletes": [
+                    {
+                      "q": {
+                        "_id": {
+                          "$in": [
+                            "brands_sequence",
+                            "categories_sequence",
+                            "suppliers_sequence",
+                            "products_sequence",
+                            "customers_sequence"
+                          ]
+                        }
+                      },
+                      "limit": 0
+                    }
+                  ]
+                }

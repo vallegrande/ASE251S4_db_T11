@@ -1,0 +1,129 @@
+# VERSION 5 - REFERENCING (Brando): order_events
+# orderId -> dbo.[order].order_id (SQL Server, referencia lógica entre motores) ; customerId -> customers._id
+databaseChangeLog:
+  - changeSet:
+      id: 005-order-events
+      author: brando
+      # Historial de estados de un pedido.
+      changes:
+        - runCommand:
+            command: |
+                {
+                  "create": "order_events",
+                  "validator": {
+                    "$jsonSchema": {
+                      "bsonType": "object",
+                      "required": [
+                        "orderId",
+                        "customerId",
+                        "eventType",
+                        "eventAt"
+                      ],
+                      "properties": {
+                        "orderId": {
+                          "bsonType": [
+                            "long",
+                            "int"
+                          ]
+                        },
+                        "customerId": {
+                          "bsonType": [
+                            "long",
+                            "int"
+                          ]
+                        },
+                        "eventType": {
+                          "enum": [
+                            "CREATED",
+                            "CONFIRMED",
+                            "READY_FOR_PICKUP",
+                            "COMPLETED",
+                            "CANCELLED"
+                          ]
+                        },
+                        "eventAt": {
+                          "bsonType": "date"
+                        },
+                        "note": {
+                          "bsonType": "string",
+                          "maxLength": 300
+                        }
+                      }
+                    }
+                  },
+                  "validationLevel": "strict",
+                  "validationAction": "error"
+                }
+        - runCommand:
+            command: |
+                {
+                  "createIndexes": "order_events",
+                  "indexes": [
+                    {
+                      "key": {
+                        "orderId": 1,
+                        "eventAt": 1
+                      },
+                      "name": "ix_order_events_order_time"
+                    },
+                    {
+                      "key": {
+                        "customerId": 1,
+                        "eventAt": -1
+                      },
+                      "name": "ix_order_events_customer_time"
+                    }
+                  ]
+                }
+        - runCommand:
+            command: |
+                {
+                  "insert": "order_events",
+                  "documents": [
+                    {
+                      "orderId": {
+                        "$numberInt": "1"
+                      },
+                      "customerId": {
+                        "$numberLong": "1"
+                      },
+                      "eventType": "CREATED",
+                      "eventAt": {
+                        "$date": "2026-01-01T00:00:00Z"
+                      },
+                      "note": "Pedido registrado desde el checkout"
+                    },
+                    {
+                      "orderId": {
+                        "$numberInt": "1"
+                      },
+                      "customerId": {
+                        "$numberLong": "1"
+                      },
+                      "eventType": "CONFIRMED",
+                      "eventAt": {
+                        "$date": "2026-01-01T00:00:00Z"
+                      },
+                      "note": "Stock validado"
+                    },
+                    {
+                      "orderId": {
+                        "$numberInt": "2"
+                      },
+                      "customerId": {
+                        "$numberLong": "2"
+                      },
+                      "eventType": "CREATED",
+                      "eventAt": {
+                        "$date": "2026-01-01T00:00:00Z"
+                      },
+                      "note": "Pedido registrado desde el checkout"
+                    }
+                  ]
+                }
+      rollback:
+        - runCommand:
+            command: |
+                {
+                  "drop": "order_events"
+                }

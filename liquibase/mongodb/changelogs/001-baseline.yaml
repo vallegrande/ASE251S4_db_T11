@@ -1,0 +1,374 @@
+# VERSION 1 - Baseline de MongoDB (Agrimarket)
+# Las 10 colecciones que usa el backend Spring WebFlux, con validadores e índices.
+databaseChangeLog:
+  - changeSet:
+      id: 001-baseline
+      author: equipo11
+      # Un solo changeset = una versión. El rollback elimina las 10 colecciones.
+      changes:
+        - runCommand:
+            command: |
+                {
+                  "create": "customers",
+                  "validator": {
+                    "$jsonSchema": {
+                      "bsonType": "object",
+                      "required": [
+                        "_id",
+                        "docType",
+                        "docNumber",
+                        "firstName",
+                        "lastName",
+                        "email",
+                        "customerSince"
+                      ],
+                      "properties": {
+                        "_id": {
+                          "bsonType": [
+                            "long",
+                            "int"
+                          ]
+                        },
+                        "docType": {
+                          "bsonType": "string",
+                          "maxLength": 20
+                        },
+                        "docNumber": {
+                          "bsonType": "string",
+                          "maxLength": 20
+                        },
+                        "firstName": {
+                          "bsonType": "string",
+                          "maxLength": 100
+                        },
+                        "lastName": {
+                          "bsonType": "string",
+                          "maxLength": 100
+                        },
+                        "email": {
+                          "bsonType": "string",
+                          "maxLength": 255
+                        }
+                      }
+                    }
+                  },
+                  "validationLevel": "strict",
+                  "validationAction": "error"
+                }
+        - runCommand:
+            command: |
+                {
+                  "create": "products",
+                  "validator": {
+                    "$jsonSchema": {
+                      "bsonType": "object",
+                      "required": [
+                        "_id",
+                        "name",
+                        "basePrice",
+                        "categoryId",
+                        "brandId"
+                      ],
+                      "properties": {
+                        "_id": {
+                          "bsonType": [
+                            "long",
+                            "int"
+                          ]
+                        },
+                        "name": {
+                          "bsonType": "string",
+                          "maxLength": 200
+                        },
+                        "categoryId": {
+                          "bsonType": "string"
+                        },
+                        "brandId": {
+                          "bsonType": "string"
+                        }
+                      }
+                    }
+                  },
+                  "validationLevel": "strict",
+                  "validationAction": "error"
+                }
+        - runCommand:
+            command: |
+                {
+                  "create": "suppliers",
+                  "validator": {
+                    "$jsonSchema": {
+                      "bsonType": "object",
+                      "required": [
+                        "_id",
+                        "businessName"
+                      ],
+                      "properties": {
+                        "_id": {
+                          "bsonType": [
+                            "long",
+                            "int"
+                          ]
+                        },
+                        "businessName": {
+                          "bsonType": "string",
+                          "maxLength": 150
+                        }
+                      }
+                    }
+                  },
+                  "validationLevel": "strict",
+                  "validationAction": "error"
+                }
+        - runCommand:
+            command: |
+                {
+                  "create": "brands",
+                  "validator": {
+                    "$jsonSchema": {
+                      "bsonType": "object",
+                      "required": [
+                        "_id",
+                        "brandName"
+                      ],
+                      "properties": {
+                        "_id": {
+                          "bsonType": [
+                            "long",
+                            "int"
+                          ]
+                        },
+                        "brandName": {
+                          "bsonType": "string",
+                          "maxLength": 150
+                        }
+                      }
+                    }
+                  },
+                  "validationLevel": "strict",
+                  "validationAction": "error"
+                }
+        - runCommand:
+            command: |
+                {
+                  "create": "categories",
+                  "validator": {
+                    "$jsonSchema": {
+                      "bsonType": "object",
+                      "required": [
+                        "_id",
+                        "categoryName",
+                        "level",
+                        "code"
+                      ],
+                      "properties": {
+                        "_id": {
+                          "bsonType": [
+                            "long",
+                            "int"
+                          ]
+                        },
+                        "categoryName": {
+                          "bsonType": "string",
+                          "maxLength": 150
+                        },
+                        "code": {
+                          "bsonType": "string",
+                          "maxLength": 20
+                        }
+                      }
+                    }
+                  },
+                  "validationLevel": "strict",
+                  "validationAction": "error"
+                }
+        - runCommand:
+            command: |
+                {
+                  "create": "ubigeos"
+                }
+        - runCommand:
+            command: |
+                {
+                  "create": "carts"
+                }
+        - runCommand:
+            command: |
+                {
+                  "create": "staff_users"
+                }
+        - runCommand:
+            command: |
+                {
+                  "create": "auth_sessions"
+                }
+        - runCommand:
+            command: |
+                {
+                  "create": "counters"
+                }
+        - runCommand:
+            command: |
+                {
+                  "createIndexes": "customers",
+                  "indexes": [
+                    {
+                      "key": {
+                        "docType": 1,
+                        "docNumber": 1
+                      },
+                      "name": "ux_customer_document",
+                      "unique": true
+                    },
+                    {
+                      "key": {
+                        "email": 1
+                      },
+                      "name": "email",
+                      "unique": true
+                    }
+                  ]
+                }
+        - runCommand:
+            command: |
+                {
+                  "createIndexes": "staff_users",
+                  "indexes": [
+                    {
+                      "key": {
+                        "email": 1
+                      },
+                      "name": "email",
+                      "unique": true
+                    }
+                  ]
+                }
+        - runCommand:
+            command: |
+                {
+                  "createIndexes": "auth_sessions",
+                  "indexes": [
+                    {
+                      "key": {
+                        "tokenHash": 1
+                      },
+                      "name": "tokenHash",
+                      "unique": true
+                    },
+                    {
+                      "key": {
+                        "expiresAt": 1
+                      },
+                      "name": "expiresAt",
+                      "expireAfterSeconds": 0
+                    }
+                  ]
+                }
+        - runCommand:
+            command: |
+                {
+                  "createIndexes": "products",
+                  "indexes": [
+                    {
+                      "key": {
+                        "categoryId": 1
+                      },
+                      "name": "ix_products_categoryId"
+                    },
+                    {
+                      "key": {
+                        "brandId": 1
+                      },
+                      "name": "ix_products_brandId"
+                    },
+                    {
+                      "key": {
+                        "sku": 1
+                      },
+                      "name": "ix_products_sku"
+                    }
+                  ]
+                }
+        - runCommand:
+            command: |
+                {
+                  "createIndexes": "carts",
+                  "indexes": [
+                    {
+                      "key": {
+                        "customerId": 1
+                      },
+                      "name": "ix_carts_customerId"
+                    }
+                  ]
+                }
+        - runCommand:
+            command: |
+                {
+                  "createIndexes": "suppliers",
+                  "indexes": [
+                    {
+                      "key": {
+                        "docNumber": 1
+                      },
+                      "name": "ix_suppliers_docNumber"
+                    },
+                    {
+                      "key": {
+                        "isActive": 1
+                      },
+                      "name": "ix_suppliers_isActive"
+                    }
+                  ]
+                }
+      rollback:
+        - runCommand:
+            command: |
+                {
+                  "drop": "counters"
+                }
+        - runCommand:
+            command: |
+                {
+                  "drop": "auth_sessions"
+                }
+        - runCommand:
+            command: |
+                {
+                  "drop": "staff_users"
+                }
+        - runCommand:
+            command: |
+                {
+                  "drop": "carts"
+                }
+        - runCommand:
+            command: |
+                {
+                  "drop": "ubigeos"
+                }
+        - runCommand:
+            command: |
+                {
+                  "drop": "categories"
+                }
+        - runCommand:
+            command: |
+                {
+                  "drop": "brands"
+                }
+        - runCommand:
+            command: |
+                {
+                  "drop": "suppliers"
+                }
+        - runCommand:
+            command: |
+                {
+                  "drop": "products"
+                }
+        - runCommand:
+            command: |
+                {
+                  "drop": "customers"
+                }

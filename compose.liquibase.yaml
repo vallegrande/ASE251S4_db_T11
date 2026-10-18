@@ -1,0 +1,117 @@
+# ================================================================
+# AgriMarket - Versionamiento con LIQUIBASE (SQL Server + MongoDB) y transacciones en MongoDB
+#
+#   docker compose -f compose.liquibase.yaml up -d --build
+#
+# Es independiente de compose.yaml (el de la actividad anterior): usa otro proyecto, otros volúmenes
+# y otros puertos (SQL Server 1434, MongoDB 27018) para que no choquen.
+# Tip PowerShell:  $env:COMPOSE_FILE = "compose.liquibase.yaml"   (así ya no repites -f)
+# ================================================================
+name: agrimarket-liquibase
+
+services:
+
+  # ---------------- SQL Server ----------------
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${SQL_ADMIN_PASSWORD}
+      MSSQL_PID: Developer
+      MSSQL_MEMORY_LIMIT_MB: 2048
+    ports:
+      - "${LB_SQL_PORT:-1434}:1433"
+    volumes:
+      - lb-sqlserver-data:/var/opt/mssql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$${MSSQL_SA_PASSWORD}\" -C -Q \"SELECT 1\""
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  # Liquibase no crea bases de datos: este paso crea "Agrimarket" vacía antes de los changelogs.
+  sqlserver-createdb:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    entrypoint:
+      - /opt/mssql-tools18/bin/sqlcmd
+      - -S
+      - sqlserver
+      - -U
+      - sa
+      - -P
+      - ${SQL_ADMIN_PASSWORD}
+      - -C
+      - -Q
+      - "IF DB_ID('Agrimarket') IS NULL CREATE DATABASE Agrimarket;"
+    restart: "no"
+
+  # Liquibase para SQL Server (changelogs formatted SQL en liquibase/sqlserver)
+  liquibase-sqlserver:
+    image: liquibase/liquibase:4.33.0
+    depends_on:
+      sqlserver-createdb:
+        condition: service_completed_successfully
+    environment:
+      LIQUIBASE_COMMAND_URL: "jdbc:sqlserver://sqlserver:1433;databaseName=Agrimarket;encrypt=true;trustServerCertificate=true"
+      LIQUIBASE_COMMAND_USERNAME: sa
+      LIQUIBASE_COMMAND_PASSWORD: ${SQL_ADMIN_PASSWORD}
+      LIQUIBASE_COMMAND_CHANGELOG_FILE: changelog/changelog-master.yaml
+      LIQUIBASE_ANALYTICS_ENABLED: "false"
+    volumes:
+      - ./liquibase/sqlserver:/liquibase/changelog:ro
+    command: ["update"]
+    restart: "no"
+
+  # ---------------- MongoDB (REPLICA SET de un nodo: obligatorio para transacciones) ----------------
+  # Sin usuario/contraseña a propósito: un replica set con autenticación exige además un keyFile.
+  # Es solo para desarrollo/demostración; no lo uses así en producción.
+  mongodb:
+    image: mongo:8.0
+    command: ["--replSet", "rs0", "--bind_ip_all"]
+    ports:
+      - "${LB_MONGO_PORT:-27018}:27017"
+    volumes:
+      - lb-mongo-data:/data/db
+      - ./transactions:/transactions:ro
+      - ./demo:/demo:ro
+    healthcheck:
+      # Inicia el replica set la primera vez y solo se considera sano cuando el nodo ya es PRIMARY.
+      test:
+        - CMD
+        - mongosh
+        - --quiet
+        - --eval
+        - "try { quit(rs.status().myState === 1 ? 0 : 1) } catch (e) { rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'mongodb:27017'}]}); quit(1) }"
+      interval: 5s
+      timeout: 10s
+      retries: 30
+      start_period: 10s
+
+  # Liquibase para MongoDB (imagen propia con la extensión; changelogs YAML en liquibase/mongodb)
+  liquibase-mongodb:
+    build:
+      context: ./liquibase
+      dockerfile: Dockerfile.mongodb
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      LIQUIBASE_COMMAND_URL: "mongodb://mongodb:27017/Agrimarket"
+      LIQUIBASE_COMMAND_CHANGELOG_FILE: changelog/changelog-master.yaml
+      LIQUIBASE_ANALYTICS_ENABLED: "false"
+    volumes:
+      - ./liquibase/mongodb:/liquibase/changelog:ro
+    command: ["update"]
+    restart: "no"
+
+volumes:
+  lb-sqlserver-data:
+  lb-mongo-data:

@@ -10,3 +10,17 @@ Scripts para mostrar el versionamiento y el modelado con **Referencing** (ver `d
 
 Requisitos: Docker Compose y el archivo `.env` creado desde `.env.example`.
 En Windows se ejecutan desde Git Bash o WSL.
+
+## Scripts de PowerShell (Liquibase y transacciones)
+
+| Script | Qué hace |
+|---|---|
+| `demo-liquibase.ps1` | Liquibase paso a paso: SQL Server y MongoDB, `update`, `update-count`, rollback y volver a avanzar |
+| `demo-transacciones.ps1` | Transacciones de MongoDB: commit, abort y bloqueos |
+
+Si PowerShell no deja ejecutarlos, habilita scripts solo en esa ventana:
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\demo\demo-liquibase.ps1
+```
